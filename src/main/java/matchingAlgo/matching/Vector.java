@@ -16,8 +16,13 @@ public class Vector {
     }
 
     public Vector(Coordinate c){
-        this.x = c.getLatitude();
-        this.y = c.getLongtitude();
+        this.x = c.getLongtitude();
+        this.y = c.getLatitude();
+    }
+
+    public Vector( Vector v1, Vector v2 ){
+        this.x = v2.getX() - v1.getX();
+        this.y = v2.getY() - v1.getY();
     }
     
     public Vector(Coordinate c1, Coordinate c2){
@@ -41,12 +46,11 @@ public class Vector {
     public Vector normalize(){
         return this.multiply( 1.0 / this.length() );
     }
-    
-    
 
     public double getX(){
         return this.x;
     }
+
     public double getY(){
         return this.y;
     }

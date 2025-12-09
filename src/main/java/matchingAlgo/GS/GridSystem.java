@@ -25,6 +25,14 @@ public class GridSystem {
         this.maxNumber = Math.max( maxNumber, minNumber );
     }
 
+    public double getMinNumber(){
+        return this.minNumber;
+    }
+
+    public double getMaxNumber(){
+        return this.maxNumber;
+    }
+
     public int minNumberToGrid(){
         //Get minimum grid id
         return 0;
@@ -42,6 +50,9 @@ public class GridSystem {
 
     public int numberToGrid(double number){
         //Converts a number into a value of the grid
+        while ( number > this.maxNumber ) number -= ( this.maxNumber - this.minNumber );
+        while ( number < this.minNumber ) number += ( this.maxNumber - this.minNumber );
+
         int value = (int)((number - this.minNumber)/this.cellSize());
         return Math.max( minNumberToGrid(), Math.min( maxNumberToGrid(), value ) );
     }
