@@ -50,8 +50,27 @@ public class GridSystem {
 
     public int numberToGrid(double number){
         //Converts a number into a value of the grid
-        int sub = ((int)( number - this.minNumber )) / ((int)( this.maxNumber - this.minNumber ));
-        double v = number - sub * ( this.maxNumber - this.minNumber );
-        return (int)(( v - this.minNumber) / cellSize());
+        double origin = ( number - this.minNumber );
+        double maxValue = ( this.maxNumber - this.minNumber );
+
+        int inside = (int)(origin / maxValue);
+        double v = origin - inside * maxValue;
+
+        if ( v < 0 ){
+            return (int)(( v + maxValue ) / cellSize());
+        } else {
+            return (int)(v / cellSize());
+        }
+
+
+
+    }
+
+    public static void main(String[] args) {
+        GridSystem gs = new GridSystem(-180., 180., 1.);
+        System.out.println(gs.numberToGrid(200));
+
+        GridSystem gs2 = new GridSystem(-180., 180., 0.1);
+        System.out.println(gs2.numberToGrid(200));
     }
 }

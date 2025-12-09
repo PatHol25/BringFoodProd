@@ -70,9 +70,8 @@ public class User {
             Vector shiftedLeftPoint = new Vector( ( gsLongtitude.getMaxNumber() + leftPoint.getX() ) + gsLongtitude.getMaxNumber(), leftPoint.getY() );
             double distanceRL = new Vector( rightPoint, shiftedLeftPoint ).length();
 
-            System.out.println("Left: " + shiftedLeftPoint.toString() + " Right: " + rightPoint.toString());
+
             if ( distanceRL < distanceLR ){
-                System.out.println("Over the Longtidude border.");
                 leftPoint = rightPoint;
                 rightPoint = shiftedLeftPoint;
                 minDistance = distanceRL;
@@ -82,7 +81,6 @@ public class User {
             double distanceDN = new Vector( northPole, rightPoint ).length();
 
             if ( distanceDN < minDistance ){
-                System.out.println("Over the North Pole.");
                 leftPoint = northPole;
                 minDistance = distanceDN;
             }
@@ -91,7 +89,6 @@ public class User {
             double distanceSN = new Vector( southPole, rightPoint ).length();
 
             if ( distanceSN < minDistance ){
-                System.out.println("Over the South Pole.");
                 leftPoint = southPole;
                 minDistance = distanceSN;
             }
@@ -145,7 +142,6 @@ public class User {
         }
 
         for ( double x = mostLeftX; x <= mostRightX; x += stepSizeX ){
-
             for ( double y = mostBottomY; y <= mostTopY; y += stepSizeY ){
 
                 int gridX = gsLongtitude.numberToGrid( x );
@@ -157,6 +153,7 @@ public class User {
 
                     int[][] newGridList = new int[gridList.length + 1][];
                     System.arraycopy(gridList, 0, newGridList, 0, gridList.length);
+
 
                     newGridList[newGridList.length - 1] = new int[]{currentGridX, currentGridY};
                     gridList = newGridList;
