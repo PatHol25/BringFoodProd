@@ -1,5 +1,10 @@
 package com.example.demo;
 
+import matchingAlgo.GS.Coordinate;
+import matchingAlgo.GS.GridSystem;
+import matchingAlgo.GS.User;
+import matchingAlgo.GS.UserDatabase;
+
 public class GridTests {
     public static void main(String[] args) {
 
@@ -13,9 +18,25 @@ public class GridTests {
         GridSystem latitudeGS = new GridSystem(-90., 90., 0.1);
         System.out.println( latitudeGS.numberToGrid(10.1) );
 
-        Coordinate c = new Coordinate(52.520008, 13.404954);
-        c.setLongtitudeId(longitudeGS.numberToGrid(c.getLongtitude()));
-        c.setLatitudeId(latitudeGS.numberToGrid(c.getLatitude()));
-        System.out.println(c);
+        //User 0
+        Coordinate home = new Coordinate(52.520008, 13.404954);
+        home.setLongtitudeId(longitudeGS.numberToGrid(home.getLongtitude()));
+        home.setLatitudeId(latitudeGS.numberToGrid(home.getLatitude()));
+        System.out.println(home);
+
+        Coordinate dmShop = new Coordinate(52.520008, 13.404954);
+        dmShop.setLongtitudeId(longitudeGS.numberToGrid(dmShop.getLongtitude()));
+        dmShop.setLatitudeId(latitudeGS.numberToGrid(dmShop.getLatitude()));
+        System.out.println(dmShop);
+
+        User Holzer = new User("0", home, dmShop);
+        System.out.println(Holzer);
+
+        UserDatabase userDB = new UserDatabase(longitudeGS.maxNumberToGrid(), latitudeGS.maxNumberToGrid());
+        userDB.addUser(Holzer);
+
+        userDB.printDatabase();
+        userDB.removeUser(Holzer);
+        userDB.printDatabase();
     }
 }

@@ -1,4 +1,4 @@
-package com.example.demo;
+package matchingAlgo.GS;
 
 public class Coordinate {
     private double latitude;
@@ -11,6 +11,8 @@ public class Coordinate {
         this.latitude = latitude;
         this.longtitude = longtitude;
 
+        //Ids are set to -1 because they are not yet known
+        //They will be set after the grid system is constructed
         latitudeId = -1;
         longtitudeId = -1;
     }
@@ -35,6 +37,10 @@ public class Coordinate {
     }
     public double getLongtitude() {
         return longtitude;
+    }
+
+    public double distance(Coordinate other){
+        return Math.sqrt( Math.pow( other.latitude - this.latitude, 2 ) + Math.pow( other.longtitude - this.longtitude, 2 ) );
     }
 
     public String toString() {

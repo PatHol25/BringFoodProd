@@ -1,4 +1,4 @@
-package com.example.demo;
+package matchingAlgo.GS;
 
 
 public class GridSystem {
@@ -7,6 +7,9 @@ public class GridSystem {
     final double minNumber;
     final double maxNumber;
 
+    //Different constructors
+    //First one is constructing with a number of cells
+    //Second one is constructing with a distance between cells
     public GridSystem(double minNumber, double maxNumber, int numCells){
         this( minNumber, maxNumber );
         this.numCells = numCells;
@@ -23,18 +26,23 @@ public class GridSystem {
     }
 
     public int minNumberToGrid(){
+        //Get minimum grid id
         return 0;
     }
 
     public int maxNumberToGrid(){
+        //Get maximum grid id
         return numCells;
     }
 
     public double cellSize(){
+        //Get the size of one cell
         return (this.maxNumber - this.minNumber) / this.numCells;
     }
 
     public int numberToGrid(double number){
-        return (int)((number - this.minNumber)/this.cellSize());
+        //Converts a number into a value of the grid
+        int value = (int)((number - this.minNumber)/this.cellSize());
+        return Math.max( minNumberToGrid(), Math.min( maxNumberToGrid(), value ) );
     }
 }
