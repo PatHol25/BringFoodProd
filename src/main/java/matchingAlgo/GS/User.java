@@ -144,9 +144,10 @@ public class User {
             stepSizeY = gsLatitude.cellSize();
         }
 
-
         for ( double x = mostLeftX; x <= mostRightX; x += stepSizeX ){
+
             for ( double y = mostBottomY; y <= mostTopY; y += stepSizeY ){
+
                 int gridX = gsLongtitude.numberToGrid( x );
                 int gridY = gsLatitude.numberToGrid( y );
 

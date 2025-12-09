@@ -28,6 +28,10 @@ public class UserDatabase {
         }
     }
 
+    public User[] usersOfCell( int longtitudeId, int latitudeId ){
+        return userDatabase[longtitudeId][latitudeId];
+    }
+
     public void removeUser(User b){
         int longtitudeId = b.getHomeCoordinate().getLongtitudeId();
         int latitudeId = b.getHomeCoordinate().getLatitudeId();

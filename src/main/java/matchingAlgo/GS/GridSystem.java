@@ -50,10 +50,8 @@ public class GridSystem {
 
     public int numberToGrid(double number){
         //Converts a number into a value of the grid
-        while ( number > this.maxNumber ) number -= ( this.maxNumber - this.minNumber );
-        while ( number < this.minNumber ) number += ( this.maxNumber - this.minNumber );
-
-        int value = (int)((number - this.minNumber)/this.cellSize());
-        return Math.max( minNumberToGrid(), Math.min( maxNumberToGrid(), value ) );
+        int sub = ((int)( number - this.minNumber )) / ((int)( this.maxNumber - this.minNumber ));
+        double v = number - sub * ( this.maxNumber - this.minNumber );
+        return (int)(( v - this.minNumber) / cellSize());
     }
 }
