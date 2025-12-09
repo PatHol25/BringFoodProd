@@ -131,8 +131,8 @@ public class User {
         gridList[0] = new int[]{currentGridX, currentGridY};
 
         //Check if in same Grid then the for loops are useless
-        double stepSizeX = gsLongtitude.cellSize() / 3;
-        double stepSizeY = gsLatitude.cellSize() / 3;
+        double stepSizeX = gsLongtitude.cellSize() / 2;
+        double stepSizeY = gsLatitude.cellSize() / 2;
         if ( gsLongtitude.numberToGrid(mostLeftX) == gsLongtitude.numberToGrid( mostRightX ) ) {
             stepSizeX = gsLongtitude.cellSize();
         }
