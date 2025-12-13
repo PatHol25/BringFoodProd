@@ -27,8 +27,6 @@ public class ShopperDatabaseSearcher {
             minDistance[i][1] = 0;
         }
 
-        int foundElements = 0;
-        int sameGrid = 0;
         //Min Distance array is a sorted array storing the minimum distance staring with the highest distance going to the lowest distance
         for ( int[] cell : pathGridCells ){
             int cellX = cell[0];
@@ -55,18 +53,13 @@ public class ShopperDatabaseSearcher {
 
                 }
 
-                sameGrid++;
                 if ( d < minDistance[0][0] ){
-                    foundElements++;
-
                     minDistance[0][0] = d;
                     minDistance[0][1] = pathID;
-
                     bestSamples[0] = u;
 
                     for ( int j = 0; j < minDistance.length - 1; j++ ){
                         if ( minDistance[j][0] < minDistance[j + 1][0] ){
-
                             double[] temp = minDistance[j];
                             minDistance[j] = minDistance[j + 1];
                             minDistance[ j + 1 ] = temp;
@@ -79,8 +72,6 @@ public class ShopperDatabaseSearcher {
                 }
             }
         }
-        System.out.println( "Found " + foundElements + " possible buyers." );
-        System.out.println( "Same Grid: " + sameGrid );
         return bestSamples;
     }
 }
