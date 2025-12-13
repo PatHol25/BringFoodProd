@@ -30,19 +30,20 @@ public class GridTests {
 
         double fxHomeX = getLongitude();
         double fxHomeY = getLatitude();
-        int fxHomeXGrid = longitudeGS.numberToGrid(fxHomeX);
-        int fxHomeYGrid = latitudeGS.numberToGrid(fxHomeY);
 
         Random r = new Random();
         double fxShopX = fxHomeX + r.nextDouble() * 0.2 - 0.1;
         double fxShopY = fxHomeY + r.nextDouble() * 0.2 - 0.1;
+
+        double fxEndX = fxShopX + r.nextDouble() * 0.2 - 0.1;
+        double fxEndY = fxShopY + r.nextDouble() * 0.2 - 0.1;
 
         System.out.println("Home: " + fxHomeX + ", " + fxHomeY);
         System.out.println("Shop: " + fxShopX + ", " + fxShopY);
         System.out.println( "Distance: " + Math.pow( ( Math.pow( ( fxHomeX - fxShopX ), 2 ) + Math.pow( ( fxHomeY - fxShopY ), 2 ) ), 0.5 ) * 111 );
 
         System.out.println("User Generation...");
-        for ( int i = 1; i < 10_000_000; i++ ){
+        for ( int i = 1; i < 5_000_000; i++ ){
             double x = fxShopX + r.nextDouble() * 0.5 - 0.25;
             double y = fxShopY + r.nextDouble() * 0.5 - 0.25;
 
@@ -64,7 +65,7 @@ public class GridTests {
 
         System.out.println("User Generation done.");
 
-        ShopperDatabaseSearcher sds = new ShopperDatabaseSearcher( userDB );
+        ShopperDatabaseSearcher sds = new ShopperDatabaseSearcher( userDB, longitudeGS, latitudeGS );
 
         //User 0 is a shopper
         Coordinate home = new Coordinate( fxHomeX, fxHomeY );
@@ -75,29 +76,31 @@ public class GridTests {
         sparShop.setLongtitudeId(longitudeGS.numberToGrid(sparShop.getLongtitude()));
         sparShop.setLatitudeId(latitudeGS.numberToGrid(sparShop.getLatitude()));
 
-        User felix = new User( String.valueOf( "0" ), home, sparShop);
+        Coordinate fxEnd = new Coordinate( fxEndX, fxEndY );
+        fxEnd.setLongtitudeId(longitudeGS.numberToGrid(sparShop.getLongtitude()));
+        fxEnd.setLatitudeId(latitudeGS.numberToGrid(sparShop.getLatitude()));
+
+        User felix = new User( String.valueOf( "0" ), home, sparShop, fxEnd );
 
         System.out.println("Matching...");
         long start = System.nanoTime();
-        int[][] gridCells = felix.getPossibleGrids( 0.1, 0.1, longitudeGS, latitudeGS, true );
-        System.out.println( "Grid Cells: " + gridCells.length );
+        int[][] homeshopCells = User.getPossibleGrids( felix.getHomeCoordinate(), felix.getShopCoordinate(), 1, 1, longitudeGS, latitudeGS, true );
+        int[][] shopEndCells = User.getPossibleGrids( felix.getHomeCoordinate(), felix.getEndCoordinate(), 1, 1, longitudeGS, latitudeGS, true );
+        int[][] gridCells = User.mergeGrids( homeshopCells, shopEndCells );
+        System.out.println( "Home-Shop Cells: " + homeshopCells.length + " Shop-End Cells: " + shopEndCells.length + " Grid Cells: " + gridCells.length );
+
 
         long gridCellsTime = System.nanoTime();
-
-        User[] felixPossibleUsers = sds.l2DistanceApproximation( 10, felix, gridCells );
+        User[] felixPossibleUsers = sds.minDistanceUsers( 10, felix, gridCells, true );
         System.out.println( "Possible Users: " + felixPossibleUsers.length );
-        long l2Time = System.nanoTime();
-
-        User bestUser = sds.fourPointApproximation( felix, felixPossibleUsers );
-        long fourPointTime = System.nanoTime();
 
         long end = System.nanoTime();
         long elapsed = end - start;
 
         System.out.println("Dauer: " + (elapsed / 1_000_000) + " ms");
         System.out.println("Grid Cells: " + (gridCellsTime - start) / 1_000_000 + " ms");
-        System.out.println("L2 Distance: " + (l2Time - gridCellsTime) / 1_000_000 + " ms");
-        System.out.println("Four Point: " + (fourPointTime - l2Time) / 1_000_000 + " ms");
+        System.out.println("L2 Distance: " + (end - gridCellsTime) / 1_000_000 + " ms");
+        System.out.println("Elapsed: " + (end - start) / 1_000_000 + " ms");
         System.out.println("Matching done.");
 
     }

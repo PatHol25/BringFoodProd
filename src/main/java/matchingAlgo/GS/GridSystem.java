@@ -61,9 +61,14 @@ public class GridSystem {
         } else {
             return (int)(v / cellSize());
         }
+    }
 
+    public double gridLeftNumber(int grid){
+        return this.minNumber + grid * cellSize();
+    }
 
-
+    public double gridRightNumber(int grid){
+        return this.minNumber + (grid + 1) * cellSize();
     }
 
     public static void main(String[] args) {

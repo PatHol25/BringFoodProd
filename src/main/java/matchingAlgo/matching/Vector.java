@@ -1,10 +1,11 @@
 package matchingAlgo.matching;
 
 import matchingAlgo.GS.Coordinate;
+import matchingAlgo.GS.GridSystem;
 
 public class Vector {
-    private double x;
-    private double y;
+    public double x;
+    public double y;
 
     public Vector(){
         this(0,0);

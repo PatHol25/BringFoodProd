@@ -1,5 +1,6 @@
 package matchingAlgo.matching;
 
+import matchingAlgo.GS.GridSystem;
 import matchingAlgo.GS.User;
 import matchingAlgo.GS.UserDatabase;
 
@@ -7,19 +8,23 @@ import matchingAlgo.GS.UserDatabase;
 
 public class ShopperDatabaseSearcher {
     //Finds the best buyer for a given shopper
-    private UserDatabase buyerDatabase;
+    private final UserDatabase buyerDatabase;
+    private final GridSystem gsLongtitude;
+    private final GridSystem gsLatitude;
 
-    public ShopperDatabaseSearcher(UserDatabase buyerDatabase ){
+    public ShopperDatabaseSearcher(UserDatabase buyerDatabase, GridSystem gsLongtitude, GridSystem gsLatitude ){
         this.buyerDatabase = buyerDatabase;
+        this.gsLongtitude = gsLongtitude;
+        this.gsLatitude = gsLatitude;
     }
 
-
-    public User[] l2DistanceApproximation( int nSamples, User A, int[][] pathGridCells ){
+    public User[] minDistanceUsers( int nSamples, User A, int[][] pathGridCells, boolean shopper ){
         User[] bestSamples = new User[nSamples];
 
-        double[] minDistance = new double[nSamples];
+        double[][] minDistance = new double[nSamples][2];
         for ( int i = 0; i < nSamples; i++ ){
-            minDistance[i] = Double.MAX_VALUE;
+            minDistance[i][0] = Double.MAX_VALUE;
+            minDistance[i][1] = 0;
         }
 
         int foundElements = 0;
@@ -30,17 +35,39 @@ public class ShopperDatabaseSearcher {
             int cellY = cell[1];
 
             for ( User u : this.buyerDatabase.usersOfCell( cellX, cellY ) ){
-                double d = GraphSystem.threePointDistance( A, u, 1 );
+                double[] returnType;
+                double d;
+                double pathID;
+                if (shopper){
+                    returnType = GraphSystem.minGraphDistance( A, u,1, this.gsLongtitude, this.gsLatitude );
+                }
+                else{
+                    returnType = GraphSystem.minGraphDistance( u, A, 1,  this.gsLongtitude, this.gsLatitude );
+                }
+
+                d = returnType[0];
+                pathID = 0;
+                for ( int i = 0; i < returnType.length; i++ ){
+                    if ( returnType[i] < d ) {
+                        pathID = i;
+                        d = returnType[i];
+                    };
+
+                }
 
                 sameGrid++;
-                if ( d < minDistance[0] ){
+                if ( d < minDistance[0][0] ){
                     foundElements++;
-                    minDistance[0] = d;
+
+                    minDistance[0][0] = d;
+                    minDistance[0][1] = pathID;
+
                     bestSamples[0] = u;
 
                     for ( int j = 0; j < minDistance.length - 1; j++ ){
-                        if ( minDistance[j] < minDistance[j + 1] ){
-                            double temp = minDistance[j];
+                        if ( minDistance[j][0] < minDistance[j + 1][0] ){
+
+                            double[] temp = minDistance[j];
                             minDistance[j] = minDistance[j + 1];
                             minDistance[ j + 1 ] = temp;
 
@@ -56,23 +83,4 @@ public class ShopperDatabaseSearcher {
         System.out.println( "Same Grid: " + sameGrid );
         return bestSamples;
     }
-
-    public User fourPointApproximation( User A, User[] possibleBuyers ){
-        User minUser = null;
-        double minDistance = Double.MAX_VALUE;
-        for ( User u : possibleBuyers ){
-            if ( u != null ){
-                double[] paths = GraphSystem.fourPointDistance( A, u, 1 );
-                for ( int i = 0; i < paths.length; i++ ){
-                    if ( paths[i] < minDistance ){
-                        minDistance = paths[i];
-                        minUser = u;
-                    }
-                }
-            }
-
-        }
-        return minUser;
-    }
-
 }

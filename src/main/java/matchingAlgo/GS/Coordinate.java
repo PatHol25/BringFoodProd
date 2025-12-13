@@ -20,6 +20,7 @@ public class Coordinate {
     public void setLatitudeId(int latitudeId) {
         this.latitudeId = latitudeId;
     }
+
     public void setLongtitudeId(int longtitudeId) {
         this.longtitudeId = longtitudeId;
     }
