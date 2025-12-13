@@ -25,8 +25,8 @@ public class GridTests {
         //To get Grids of the size of ~10KM you need exactness of 0.1
         //To get Grids of the size of ~1KM you need exactness of 0.01
 
-        GridSystem longitudeGS = new GridSystem(-180., 180., 0.025 );
-        GridSystem latitudeGS = new GridSystem(-90., 90., 0.025 );
+        GridSystem longitudeGS = new GridSystem(-180., 180., 0.0125 );
+        GridSystem latitudeGS = new GridSystem(-90., 90., 0.0125 );
 
         UserDatabase userDB = new UserDatabase("buyers");
 
@@ -46,9 +46,9 @@ public class GridTests {
 
 
         System.out.println("User Generation...");
-        for ( int i = 1; i < 1; i++ ){
-            double x = getLongitude() + r.nextDouble() * 0.5 - 0.25;
-            double y = getLongitude() + r.nextDouble() * 0.5 - 0.25;
+        for ( int i = 1; i < 2; i++ ){
+            double x = fxHomeX + r.nextDouble() * 1 - 0.5;
+            double y = fxHomeY + r.nextDouble() * 1 - 0.5;
 
             Coordinate home = new Coordinate( x, y );
             home.setLongtitudeId(longitudeGS.numberToGrid(home.getLongtitude()));
@@ -86,10 +86,10 @@ public class GridTests {
         fxEnd.setLatitudeId(latitudeGS.numberToGrid(sparShop.getLatitude()));
 
 
-        User felix = new User( String.valueOf( "0" ), home, sparShop, fxEnd );
-
         System.out.println("Matching...");
         long start = System.nanoTime();
+        User felix = new User( String.valueOf( "0" ), home, sparShop, fxEnd );
+
         int[][] homeshopCells = User.getPossibleGrids( felix.getHomeCoordinate(), felix.getShopCoordinate(), 1, 1, longitudeGS, latitudeGS, true );
         int[][] shopEndCells = User.getPossibleGrids( felix.getHomeCoordinate(), felix.getEndCoordinate(), 1, 1, longitudeGS, latitudeGS, true );
         int[][] gridCells = User.mergeGrids( homeshopCells, shopEndCells );
@@ -98,19 +98,21 @@ public class GridTests {
 
         long gridCellsTime = System.nanoTime();
 
-        for ( int i = 0; i < 1600; i++ ){
+        for ( int i = 0; i < 200 * 128; i++ ){
+
             String reservedID = null;        // <- vor der Schleife initialisieren
+            String reservedGrid_ID = null;
             while (true) {
                 User[] felixPossibleUsers = sds.minDistanceUsers(10, felix, gridCells, true);
-                //System.out.println("Possible Users: " + felixPossibleUsers.length);
 
                 boolean matched = false;
                 for (User u : felixPossibleUsers) {
                     if (u == null) break;                 // Array kann Lücken enthalten
-                    boolean ok = DatabaseHandler.reserveBuyer("buyers", u.getId(), felix.getId());
+                    boolean ok = DatabaseHandler.reserveBuyer("buyers", u.getGrid_id(), u.getId(), felix.getId());
                     if (ok) {                               // erster freier Kandidat gefunden
                         //System.out.println("Reserviert: " + u.getId());
                         reservedID = u.getId();
+                        reservedGrid_ID = u.getGrid_id();
                         matched = true;
                         break;                               // innere for-Schleife beenden
                     }
@@ -118,10 +120,8 @@ public class GridTests {
                 if (matched) break;                          // <-  while-Schleife beenden
                 //System.out.println("Kein freier Käufer in den Top-10 – erneut suchen …");
                 break;
-
             }
-            DatabaseHandler.deleteUser("buyers", reservedID);
-            System.out.println( i );
+            DatabaseHandler.deleteUser("buyers", reservedGrid_ID, reservedID);
         }
 
 

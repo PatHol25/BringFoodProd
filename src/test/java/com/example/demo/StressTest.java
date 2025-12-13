@@ -12,14 +12,13 @@ import java.util.concurrent.*;
 public class StressTest {
 
     // ---------------- Konfiguration ----------------
-    private static final int THREADS = 8;
+    private static final int THREADS = 128;
     private static final int REQUESTS_PER_THREAD = 200;
 
     // Gitter­systeme wie im Haupt­programm
-    private static final GridSystem GS_LON = new GridSystem(-180., 180., 0.025);
-    private static final GridSystem GS_LAT = new GridSystem(-90., 90., 0.025);
-
     private static final Random RAND = new Random();
+    private static final GridSystem GS_LON = new GridSystem(-180., 180., 0.0125);
+    private static final GridSystem GS_LAT = new GridSystem(-90., 90., 0.0125);
 
     public static void main(String[] args) throws InterruptedException, SQLException {
 
@@ -58,15 +57,32 @@ public class StressTest {
 
     // ---------------- Ein Task (= mehrfacher Einkaufs-Request) ----------------
     private static void runRequests() throws SQLException {
+
         UserDatabase buyerDB = new UserDatabase("buyers");
         ShopperDatabaseSearcher searcher = new ShopperDatabaseSearcher(buyerDB, GS_LON, GS_LAT);
 
         for (int r = 0; r < REQUESTS_PER_THREAD; r++) {
-            System.out.println("Request " + r);
+            double fxHomeX = 180;
+            double fxHomeY = 90;
+
+            double fxShopX = fxHomeX + RAND.nextDouble() * 0.2 - 0.1;
+            double fxShopY = fxHomeY + RAND.nextDouble() * 0.2 - 0.1;
+
+            double fxEndX = fxShopX + RAND.nextDouble() * 0.2 - 0.1;
+            double fxEndY = fxShopY + RAND.nextDouble() * 0.2 - 0.1;
+
             // 1) Fiktiven Shopper erzeugen (Koordinaten irgendwo in der Welt)
-            Coordinate home = randomCoord();
-            Coordinate shop = randomNear(home);
-            Coordinate end  = randomNear(shop);
+            Coordinate home = new Coordinate( fxHomeX, fxHomeY );
+            home.setLongtitudeId(GS_LON.numberToGrid(home.getLongtitude()));
+            home.setLatitudeId(GS_LAT.numberToGrid(home.getLatitude()));
+
+            Coordinate shop = new Coordinate( fxShopX, fxShopY );
+            shop.setLongtitudeId(GS_LON.numberToGrid(shop.getLongtitude()));
+            shop.setLatitudeId(GS_LAT.numberToGrid(shop.getLatitude()));
+
+            Coordinate end = new Coordinate( fxEndX, fxEndY );
+            end.setLongtitudeId(GS_LON.numberToGrid(shop.getLongtitude()));
+            end.setLatitudeId(GS_LAT.numberToGrid(shop.getLatitude()));
 
             User shopper = new User("S-" + Thread.currentThread().getId() + "-" + r,
                                     home, shop, end);
@@ -80,7 +96,7 @@ public class StressTest {
             User reservedBuyer = null;
             for (User cand : searcher.minDistanceUsers(10, shopper, cells, true)) {
                 if (cand == null) break;
-                if (DatabaseHandler.reserveBuyer("buyers", cand.getId(), shopper.getId())) {
+                if (DatabaseHandler.reserveBuyer("buyers", cand.getGrid_id(), cand.getId(), shopper.getId())) {
                     reservedBuyer = cand;
                     break;
                 }
@@ -88,27 +104,9 @@ public class StressTest {
 
             // 4) Aufräumen
             if (reservedBuyer != null) {
-                DatabaseHandler.deleteUser("buyers", reservedBuyer.getId());
+                DatabaseHandler.deleteUser("buyers", reservedBuyer.getGrid_id(), reservedBuyer.getId());
             }
         }
     }
 
-    // ---------------- kleine Helfer ----------------
-    private static Coordinate randomCoord() {
-        double lon = RAND.nextDouble() * 360 - 180;
-        double lat = RAND.nextDouble() * 180 - 90;
-        Coordinate c = new Coordinate(lon, lat);
-        c.setLongtitudeId(GS_LON.numberToGrid(lon));
-        c.setLatitudeId(GS_LAT.numberToGrid(lat));
-        return c;
-    }
-
-    private static Coordinate randomNear(Coordinate base) {
-        double lon = base.getLongtitude() + RAND.nextDouble() * 0.2 - 0.1;
-        double lat = base.getLatitude()   + RAND.nextDouble() * 0.2 - 0.1;
-        Coordinate c = new Coordinate(lon, lat);
-        c.setLongtitudeId(GS_LON.numberToGrid(lon));
-        c.setLatitudeId(GS_LAT.numberToGrid(lat));
-        return c;
-    }
 }

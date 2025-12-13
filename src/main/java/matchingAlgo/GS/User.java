@@ -6,12 +6,14 @@ import matchingAlgo.matching.Vector;
 
 public class User {
     private String id;
+    private String grid_id;
     private Coordinate homeCoordinate;
     private Coordinate shopCoordinate;
     private Coordinate endCoordinate;
 
     public User(String id, Coordinate homeCoordinate, Coordinate shopCoordinate) {
         this.id = id;
+        this.grid_id = homeCoordinate.getLongtitudeId() + "_" + homeCoordinate.getLatitudeId();
         this.homeCoordinate = homeCoordinate;
         this.shopCoordinate = shopCoordinate;
         this.endCoordinate = homeCoordinate;
@@ -19,6 +21,7 @@ public class User {
 
     public User( String id, Coordinate homeCoordinate, Coordinate shopCoordinate, Coordinate endCoordinate ){
         this.id = id;
+        this.grid_id = homeCoordinate.getLongtitudeId() + "_" + homeCoordinate.getLatitudeId();
         this.homeCoordinate = homeCoordinate;
         this.shopCoordinate = shopCoordinate;
         this.endCoordinate = endCoordinate;
@@ -34,6 +37,10 @@ public class User {
 
     public Coordinate getEndCoordinate(){
         return this.endCoordinate;
+    }
+
+    public String getGrid_id(){
+        return this.grid_id;
     }
 
     public String getId(){

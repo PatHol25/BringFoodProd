@@ -27,12 +27,14 @@ public class ShopperDatabaseSearcher {
             minDistance[i][1] = 0;
         }
 
+
         //Min Distance array is a sorted array storing the minimum distance staring with the highest distance going to the lowest distance
         for ( int[] cell : pathGridCells ){
             int cellX = cell[0];
             int cellY = cell[1];
 
             for ( User u : this.buyerDatabase.usersOfCell( cellX, cellY ) ){
+
                 double[] returnType;
                 double d;
                 double pathID;

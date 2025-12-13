@@ -55,10 +55,9 @@ public class UserDatabase {
         }
     }
 
-
     public void removeUser(User u) {
         try {
-            DatabaseHandler.deleteUser(tableName, u.getId());
+            DatabaseHandler.deleteUser(tableName, u.getGrid_id(), u.getId());
         } catch (SQLException ex) {
             throw new RuntimeException("removeUser() fehlgeschlagen", ex);
         }
