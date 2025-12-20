@@ -1,15 +1,32 @@
 package matchingAlgo.GS;
 
+/*
+To handle multiple Users faster the world as a glob is divided into a Grid of cells where each cell represents the Users with their home address.
+The division into the Grid happends through the splitting of the Longtitude and Latitude.
+To handle world coordinates more easily the Longtitude is reshaped from West to East from 0 representing W180 to 360 representing E180.
+The Latitude is reshaped where N90 represents 0 and S90 represents 180 degrees.
+This system does split the world into a not exactly rectangular Gridsystem.
+Yet it simplifies the process of faster User handling, and the rectangular error can be left behind.
+
+The class can be constructed in two different ways.
+First way is with the number of Grid cells between its minimum and maximum value.
+Another way is with the length of one cell.
+
+When converting a number into a grid cell residual class calculation is used.
+To show that in an example:
+Gridsystem
+    - Maxvalue = 10, Minvalue = 0, NumCells = 9
+    - Number 11 to the gridSystem is like number 1 to the gridSystem
+ */
 
 public class GridSystem {
+
     private int numCells;
 
     final double minNumber;
     final double maxNumber;
 
-    //Different constructors
-    //First one is constructing with a number of cells
-    //Second one is constructing with a distance between cells
+    //Different constructor
     public GridSystem(double minNumber, double maxNumber, int numCells){
         this( minNumber, maxNumber );
         this.numCells = numCells;
@@ -20,7 +37,7 @@ public class GridSystem {
         this.numCells = (int)(( maxNumber - minNumber ) / distance);
     }
 
-    public GridSystem( double minNumber, double maxNumber ){
+    private GridSystem( double minNumber, double maxNumber ){
         this.minNumber = Math.min( minNumber, maxNumber );
         this.maxNumber = Math.max( maxNumber, minNumber );
     }
@@ -64,10 +81,12 @@ public class GridSystem {
     }
 
     public double gridLeftNumber(int grid){
+        //Returns the left side number of one grid cell
         return this.minNumber + grid * cellSize();
     }
 
     public double gridRightNumber(int grid){
+        //Returns the right side number of one grid cell
         return this.minNumber + (grid + 1) * cellSize();
     }
 

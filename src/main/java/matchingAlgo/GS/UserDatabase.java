@@ -39,6 +39,7 @@ public class UserDatabase {
                     shop.getLongtitude(),  shop.getLatitude(),
                     end.getLongtitude(),   end.getLatitude(),
                     1.0);
+
         } catch (SQLException ex) {
             throw new RuntimeException("addUser() fehlgeschlagen", ex);
         }
@@ -62,5 +63,4 @@ public class UserDatabase {
             throw new RuntimeException("removeUser() fehlgeschlagen", ex);
         }
     }
-
 }

@@ -36,6 +36,7 @@ public class Coordinate {
     public double getLatitude() {
         return latitude;
     }
+
     public double getLongtitude() {
         return longtitude;
     }

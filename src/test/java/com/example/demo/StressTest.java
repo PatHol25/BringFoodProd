@@ -10,7 +10,6 @@ import java.util.Random;
 import java.util.concurrent.*;
 
 public class StressTest {
-
     // ---------------- Konfiguration ----------------
     private static final int THREADS = 128;
     private static final int REQUESTS_PER_THREAD = 200;
@@ -20,8 +19,8 @@ public class StressTest {
     private static final GridSystem GS_LON = new GridSystem(-180., 180., 0.0125);
     private static final GridSystem GS_LAT = new GridSystem(-90., 90., 0.0125);
 
-    public static void main(String[] args) throws InterruptedException, SQLException {
 
+    public static void main(String[] args) throws InterruptedException, SQLException {
         // Vorab: schnelle Plausi-Prüfung
         long total = DatabaseHandler.getTotalUserCount("buyers");
         if (total < THREADS * REQUESTS_PER_THREAD) {
@@ -57,7 +56,6 @@ public class StressTest {
 
     // ---------------- Ein Task (= mehrfacher Einkaufs-Request) ----------------
     private static void runRequests() throws SQLException {
-
         UserDatabase buyerDB = new UserDatabase("buyers");
         ShopperDatabaseSearcher searcher = new ShopperDatabaseSearcher(buyerDB, GS_LON, GS_LAT);
 

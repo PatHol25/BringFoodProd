@@ -11,14 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Zentrale Utility-Klasse für PostgreSQL-Zugriffe.
- * <ul>
- *   <li>HikariCP-Pool (lazy, Holder-Idiom)</li>
- *   <li>Ausschließlich Prepared Statements</li>
- *   <li>Optimierte Indexe für grid_id / user_id</li>
- * </ul>
- */
+
 public final class DatabaseHandler {
 
     /* =========================================================
@@ -81,6 +74,9 @@ public final class DatabaseHandler {
               delivery_x  DOUBLE PRECISION NOT NULL,
               delivery_y  DOUBLE PRECISION NOT NULL,
               radius      DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+              time_start  TIMESTAMP NOT NULL DEFAULT NOW(),
+              time_end    TIMESTAMP,
+              same_shop   BOOLEAN   NOT NULL DEFAULT FALSE,
               reserved    BOOLEAN   NOT NULL DEFAULT FALSE,
               reserved_by TEXT,
               reserved_at TIMESTAMP
@@ -226,52 +222,4 @@ public final class DatabaseHandler {
             return -1L;
         }
     }
-
-    public static void main(String[] args) throws Exception {
-
-        final String TABLE = "buyers";
-        System.out.println("---- TESTLAUF ----");
-
-        // ­Schema säubern
-        try (Connection c = getConnection(); Statement s = c.createStatement()) {
-            s.execute("DROP TABLE IF EXISTS " + TABLE);
-        }
-
-        // 1) Tabelle + Indexe anlegen
-        createUserTable(TABLE);
-        System.out.println("Tabelle erstellt.");
-
-        /*
-        // 2) Zwei Test-User einfügen
-        addUser(TABLE, "u1", "g1_1", 1,2,  3,4, 5,6, 1.0);
-        addUser(TABLE, "u2", "g1_1", 7,8,  9,1, 2,3, 1.0);
-        System.out.println("2 User eingefügt. Gesamt: " + getTotalUserCount(TABLE));
-
-        // 3) getUsersByGrid
-        List<User> list = getUsersByGrid(TABLE, "g1_1");
-        System.out.println("getUsersByGrid('g1_1') liefert " + list.size() + " Einträge.");
-
-        // 4) Einzelsuche
-        User u = getUserInGrid(TABLE, "g1_1", "u1");
-        System.out.println("getUserInGrid => " + (u != null ? u.getId() : "null"));
-
-        // 5) Reservierung
-        boolean ok = reserveBuyer(TABLE, "g1_1", "u1", "shopper42");
-        System.out.println("reserveBuyer => " + ok);
-
-        // 6) Löschen von u2
-        deleteUser(TABLE, "g1_1", "u2");
-        System.out.println("Nach deleteUser Gesamt: " + getTotalUserCount(TABLE));
-
-        */
-
-        // 7) Aufräumen & Pool schließen
-        try (Connection c = getConnection(); Statement s = c.createStatement()) {
-            s.execute("DROP TABLE IF EXISTS " + TABLE);
-        }
-
-        shutdownPool();
-        System.out.println("---- ENDE ----");
-    }
-
 }

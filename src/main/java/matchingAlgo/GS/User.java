@@ -10,6 +10,26 @@ public class User {
     private Coordinate homeCoordinate;
     private Coordinate shopCoordinate;
     private Coordinate endCoordinate;
+    private String timeStart;
+    private String timeEnd;
+    private boolean sameShop;
+    private double radius;
+    private boolean reserved;
+    private String reservedBy;
+    private String reservedAt;
+
+    public User( String id, Coordinate homeCoordinate, Coordinate shopCoordinate, String timeStart, String timeEnd, boolean sameShop, double radius, boolean reserved, String reservedBy, String reservedAt ){
+        this.id = id;
+        this.grid_id = homeCoordinate.getLongtitudeId() + "_" + homeCoordinate.getLatitudeId();
+        this.homeCoordinate = homeCoordinate;
+        this.shopCoordinate = shopCoordinate;
+        this.timeStart = timeStart;
+        this.timeEnd = timeEnd;
+        this.sameShop = sameShop;
+        this.radius = radius;
+        this.reserved = reserved;
+        this.reservedBy = reservedBy;
+    }
 
     public User(String id, Coordinate homeCoordinate, Coordinate shopCoordinate) {
         this.id = id;
@@ -137,7 +157,6 @@ public class User {
         Vector p4 = rightPoint.copy();
         p4.add( aWidth.inverse() );
         p4.add( aHeight.inverse() );
-
 
         int p1gridX = gsLongtitude.numberToGrid( p1.getX() );
         int p1gridY = gsLatitude.numberToGrid( p1.getY() );
