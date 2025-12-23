@@ -1,11 +1,10 @@
 package matchingAlgo.GS;
 
-import matchingAlgo.matching.GraphSystem;
 import matchingAlgo.matching.MinVector;
 import matchingAlgo.matching.Vector;
 
+
 public class User {
-    private String id;
     private String grid_id;
     private Coordinate homeCoordinate;
     private Coordinate shopCoordinate;
@@ -16,35 +15,52 @@ public class User {
     private double radius;
     private boolean reserved;
     private String reservedBy;
-    private String reservedAt;
 
-    public User( String id, Coordinate homeCoordinate, Coordinate shopCoordinate, String timeStart, String timeEnd, boolean sameShop, double radius, boolean reserved, String reservedBy, String reservedAt ){
-        this.id = id;
-        this.grid_id = homeCoordinate.getLongtitudeId() + "_" + homeCoordinate.getLatitudeId();
-        this.homeCoordinate = homeCoordinate;
-        this.shopCoordinate = shopCoordinate;
-        this.timeStart = timeStart;
-        this.timeEnd = timeEnd;
-        this.sameShop = sameShop;
-        this.radius = radius;
-        this.reserved = reserved;
-        this.reservedBy = reservedBy;
-    }
+    private UserCore core;
 
-    public User(String id, Coordinate homeCoordinate, Coordinate shopCoordinate) {
-        this.id = id;
-        this.grid_id = homeCoordinate.getLongtitudeId() + "_" + homeCoordinate.getLatitudeId();
-        this.homeCoordinate = homeCoordinate;
-        this.shopCoordinate = shopCoordinate;
-        this.endCoordinate = homeCoordinate;
-    }
+    public User( UserCore core, Coordinate homeCoordinate, Coordinate shopCoordinate, Coordinate endCoordinate, String timeStart, String timeEnd, boolean sameShop, double radius ){
+        this.core = core;
 
-    public User( String id, Coordinate homeCoordinate, Coordinate shopCoordinate, Coordinate endCoordinate ){
-        this.id = id;
         this.grid_id = homeCoordinate.getLongtitudeId() + "_" + homeCoordinate.getLatitudeId();
+
         this.homeCoordinate = homeCoordinate;
         this.shopCoordinate = shopCoordinate;
         this.endCoordinate = endCoordinate;
+
+        this.timeStart = timeStart;
+        this.timeEnd = timeEnd;
+
+        this.sameShop = sameShop;
+        this.radius = radius;
+    }
+
+    public boolean setReserved(String reservedBy){
+        if ( !this.core.reserved ){
+            this.core.reserved = true;
+            this.reservedBy = reservedBy;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean setUnreserved( String reservedBy ){
+        if ( this.core.reserved && this.core.reservedBy.equals( reservedBy) ){
+            this.core.reserved = false;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean delete(){
+        return this.core.delete;
+    }
+
+    public boolean isReserved(){
+        return this.core.reserved;
+    }
+
+    public boolean sameShop(){
+        return this.sameShop;
     }
 
     public Coordinate getShopCoordinate(){
@@ -64,12 +80,12 @@ public class User {
     }
 
     public String getId(){
-        return this.id;
+        return this.core.id;
     }
 
     public String toString(){
         return "User:\n" +
-                "  ID: " + this.id + "\n"+
+                "  ID: " + this.core.id + "\n"+
                 "  Home: \n  " + this.homeCoordinate.toString() +
                 "  Shop: \n  " + this.shopCoordinate.toString() +
                 "  End: \n  " + this.endCoordinate.toString();

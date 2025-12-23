@@ -5,13 +5,22 @@ import matchingAlgo.GS.GridSystem;
 import matchingAlgo.GS.User;
 
 public class GraphSystem {
-    public static double[] minGraphDistance(User shopper, User buyer, double ellipsis, GridSystem gsLongtitude, GridSystem gsLatitude){
+    public static double[] minGraphDistance(User shopper, User buyer, double ellipsis, GridSystem gsLongtitude, GridSystem gsLatitude, boolean sameShop ){
         //Path 1
         //Shopper -> Shopper Shop -> Buyer Shop -> Buyer Home -> Home
         //Path 2
         //Shopper -> Buyer Shop -> Buyer Home -> Shopper Shop -> Home
         //Path 3
         //Shopper -> Buyer Shop -> Shopper Shop -> Buyer Home -> Home
+
+
+        if ( sameShop ){
+            double p1d1 = MinVector.sphereDistance( shopper.getHomeCoordinate(), shopper.getShopCoordinate(), gsLongtitude, gsLatitude ).distance * ellipsis;
+            double p1d3 = MinVector.sphereDistance( shopper.getShopCoordinate(), buyer.getHomeCoordinate(), gsLongtitude, gsLatitude ).distance * ellipsis;
+            double p1d4 = MinVector.sphereDistance( buyer.getHomeCoordinate(), shopper.getEndCoordinate(), gsLongtitude, gsLatitude ).distance * ellipsis;
+            double p1 = p1d1 + p1d3 + p1d4;
+            return new double[]{p1, 1000000000000.0, 1000000000000.0};
+        }
 
         //Path 1
         double p1d1 = MinVector.sphereDistance( shopper.getHomeCoordinate(), shopper.getShopCoordinate(), gsLongtitude, gsLatitude ).distance * ellipsis;

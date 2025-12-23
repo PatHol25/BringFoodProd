@@ -1,10 +1,10 @@
 package com.example.demo;
 
-import matchingAlgo.Database.DatabaseHandler;
 import matchingAlgo.GS.Coordinate;
 import matchingAlgo.GS.GridSystem;
 import matchingAlgo.GS.User;
-import matchingAlgo.GS.UserDatabase;
+import matchingAlgo.Database.UserDatabase;
+import matchingAlgo.GS.UserCore;
 import matchingAlgo.matching.ShopperDatabaseSearcher;
 
 import java.util.Random;
@@ -20,15 +20,37 @@ public class GridTests {
         return r.nextDouble() * 360 - 180;
     }
 
-    public static void main(String[] args) throws java.sql.SQLException {
+    public static void generateUser( int id, double fxHomeX, double fxHomeY, UserDatabase userDB, GridSystem longitudeGS, GridSystem latitudeGS ){
+        Random r = new Random();
+        double x = fxHomeX + r.nextDouble() * 100 - 0.5;
+        double y = fxHomeY + r.nextDouble() * 100 - 0.5;
+
+        Coordinate home = new Coordinate( x, y );
+        home.setLongtitudeId(longitudeGS.numberToGrid(home.getLongtitude()));
+        home.setLatitudeId(latitudeGS.numberToGrid(home.getLatitude()));
+
+        double xs = x + r.nextDouble() * 0.2 - 0.1;
+        double ys = y + r.nextDouble() * 0.2 - 0.1;
+
+        Coordinate dmShop = new Coordinate( xs, ys );
+        dmShop.setLongtitudeId(longitudeGS.numberToGrid(dmShop.getLongtitude()));
+        dmShop.setLatitudeId(latitudeGS.numberToGrid(dmShop.getLatitude()));
+
+        UserCore core = new UserCore( String.valueOf( id ) );
+        User holzer = new User( core, home, dmShop, dmShop, "", "", false, 0 );
+
+        userDB.addUser(holzer);
+    }
+
+    public static void main(String[] args){
         //Minimum Longtitude: -180.0, Maximum Longtitude: 180.0
         //To get Grids of the size of ~10KM you need exactness of 0.1
         //To get Grids of the size of ~1KM you need exactness of 0.01
+        System.out.println( "Starting..." );
+        GridSystem longitudeGS = new GridSystem(-180., 180., 0.125 );
+        GridSystem latitudeGS = new GridSystem(-90., 90., 0.125 );
 
-        GridSystem longitudeGS = new GridSystem(-180., 180., 0.0125 );
-        GridSystem latitudeGS = new GridSystem(-90., 90., 0.0125 );
-
-        UserDatabase userDB = new UserDatabase("buyers");
+        UserDatabase userDB = new UserDatabase("buyers", longitudeGS, latitudeGS);
 
         double fxHomeX = 180;
         double fxHomeY = 90;
@@ -46,31 +68,14 @@ public class GridTests {
 
 
         System.out.println("User Generation...");
-        for ( int i = 1; i < 2; i++ ){
-            double x = fxHomeX + r.nextDouble() * 1 - 0.5;
-            double y = fxHomeY + r.nextDouble() * 1 - 0.5;
-
-            Coordinate home = new Coordinate( x, y );
-            home.setLongtitudeId(longitudeGS.numberToGrid(home.getLongtitude()));
-            home.setLatitudeId(latitudeGS.numberToGrid(home.getLatitude()));
-
-            double xs = x + r.nextDouble() * 0.2 - 0.1;
-            double ys = y + r.nextDouble() * 0.2 - 0.1;
-
-            Coordinate dmShop = new Coordinate( xs, ys );
-            dmShop.setLongtitudeId(longitudeGS.numberToGrid(dmShop.getLongtitude()));
-            dmShop.setLatitudeId(latitudeGS.numberToGrid(dmShop.getLatitude()));
-
-            User holzer = new User( String.valueOf( i ), home, dmShop);
-            userDB.addUser(holzer);
-
-            if ( i % 10000 == 0 ) System.out.println( i );
+        for ( int i = 1; i < 20_000_000; i++ ){
+            generateUser( i, fxHomeX, fxHomeY, userDB, longitudeGS, latitudeGS );
+            System.out.println(i);
         }
 
         System.out.println("User Generation done.");
 
         ShopperDatabaseSearcher sds = new ShopperDatabaseSearcher( userDB, longitudeGS, latitudeGS );
-
 
         //User 0 is a shopper
         Coordinate home = new Coordinate( fxHomeX, fxHomeY );
@@ -85,45 +90,19 @@ public class GridTests {
         fxEnd.setLongtitudeId(longitudeGS.numberToGrid(sparShop.getLongtitude()));
         fxEnd.setLatitudeId(latitudeGS.numberToGrid(sparShop.getLatitude()));
 
-
         System.out.println("Matching...");
         long start = System.nanoTime();
-        User felix = new User( String.valueOf( "0" ), home, sparShop, fxEnd );
+
+        UserCore core = new UserCore( String.valueOf( "0" ) );
+        User felix = new User( core, home, sparShop, fxEnd, "", "", false, 0 );
 
         int[][] homeshopCells = User.getPossibleGrids( felix.getHomeCoordinate(), felix.getShopCoordinate(), 1, 1, longitudeGS, latitudeGS, true );
         int[][] shopEndCells = User.getPossibleGrids( felix.getHomeCoordinate(), felix.getEndCoordinate(), 1, 1, longitudeGS, latitudeGS, true );
         int[][] gridCells = User.mergeGrids( homeshopCells, shopEndCells );
         System.out.println( "Home-Shop Cells: " + homeshopCells.length + " Shop-End Cells: " + shopEndCells.length + " Grid Cells: " + gridCells.length );
 
-
         long gridCellsTime = System.nanoTime();
-
-        for ( int i = 0; i < 200 * 128; i++ ){
-
-            String reservedID = null;        // <- vor der Schleife initialisieren
-            String reservedGrid_ID = null;
-            while (true) {
-                User[] felixPossibleUsers = sds.minDistanceUsers(10, felix, gridCells, true);
-
-                boolean matched = false;
-                for (User u : felixPossibleUsers) {
-                    if (u == null) break;                 // Array kann Lücken enthalten
-                    boolean ok = DatabaseHandler.reserveBuyer("buyers", u.getGrid_id(), u.getId(), felix.getId());
-                    if (ok) {                               // erster freier Kandidat gefunden
-                        //System.out.println("Reserviert: " + u.getId());
-                        reservedID = u.getId();
-                        reservedGrid_ID = u.getGrid_id();
-                        matched = true;
-                        break;                               // innere for-Schleife beenden
-                    }
-                }
-                if (matched) break;                          // <-  while-Schleife beenden
-                //System.out.println("Kein freier Käufer in den Top-10 – erneut suchen …");
-                break;
-            }
-            DatabaseHandler.deleteUser("buyers", reservedGrid_ID, reservedID);
-        }
-
+        User[] felixPossibleUsers = sds.minDistanceUsers(10, felix, gridCells, true);
 
         long end = System.nanoTime();
         long elapsed = end - start;
@@ -133,8 +112,6 @@ public class GridTests {
         System.out.println("L2 Distance: " + (end - gridCellsTime) / 1_000_000 + " ms");
         System.out.println("Elapsed: " + (end - start) / 1_000_000 + " ms");
         System.out.println("Matching done.");
-
-        DatabaseHandler.shutdownPool();
         System.out.println("Matching done.");
 
     }
