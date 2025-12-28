@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/registrations_db
+    username: registrator
+    password: registrator_pw
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: public
+        format_sql: true
+    show-sql: true
+
+server:
+  port: 8080
+  address: 0.0.0.0
