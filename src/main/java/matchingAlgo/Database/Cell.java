@@ -32,7 +32,6 @@ public class Cell{
 
     public void addUser(User u){
         while ( changing || working || currentWritingIdx >= users.length ){
-
             try {
                 Thread.sleep(1);
             } catch (InterruptedException e) {
